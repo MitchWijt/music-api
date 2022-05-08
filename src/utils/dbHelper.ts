@@ -1,29 +1,53 @@
 import _ from 'lodash'
 
 interface ExpressionValues {
-  filterExpressions: string
+  keyConditionExpression: string
   expressionAttrValues: object
 }
 
-export function convertConditionsToExpressionValues (
-  conditions: object
+interface Options {
+  pk?: {
+    value: string
+    condition: string
+  }
+  sk?: {
+    value: string
+    condition: string
+  }
+}
+
+export function convertOptionsToExpressionValues (
+  options: Options
 ): ExpressionValues {
-  let filterExpressions = ''
-  let expressionsAttrValues = {}
+  let keyConditionExpression = ''
+  let expressionAttrValues = {}
 
-  const colNames = Object.keys(conditions)
+  const pkObject = options.pk
+  const skObject = options.sk
 
-  colNames.forEach(column => {
-    const value = conditions[column]
-    filterExpressions += `${column} = :${column} AND `
-    expressionsAttrValues[`:${column}`] = value
-  })
+  // can be made in a generic function based on the PK or SK
+  // we can determine if AND needs to be appended to the string based on if we have an SK value
+  if (pkObject) {
+    if (pkObject.condition === 'begins_with') {
+      keyConditionExpression += `begins_with(PK, :pk) AND `
+    } else {
+      keyConditionExpression += `PK = :pk AND `
+    }
+    expressionAttrValues[`:pk`] = pkObject.value
+  }
 
-  // needs to remove the last AND en the end of a string
-  filterExpressions = filterExpressions.slice(0, -4)
+  if (skObject) {
+    if (skObject.condition === 'begins_with') {
+      keyConditionExpression += `begins_with(SK, :sk)`
+    } else {
+      keyConditionExpression += `SK = :sk`
+    }
+
+    expressionAttrValues[`:sk`] = skObject.value
+  }
 
   return <ExpressionValues>{
-    filterExpressions: filterExpressions,
-    expressionAttrValues: expressionsAttrValues
+    keyConditionExpression,
+    expressionAttrValues
   }
 }

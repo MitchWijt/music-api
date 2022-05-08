@@ -1,5 +1,5 @@
 import { DocumentClient, ItemList } from 'aws-sdk/clients/dynamodb'
-import { convertConditionsToExpressionValues } from '../utils/dbHelper'
+import { convertOptionsToExpressionValues } from '../utils/dbHelper'
 
 const ddb = new DocumentClient({ region: 'us-east-1' })
 
@@ -9,23 +9,30 @@ export default {
   findAll
 }
 
-async function findAll<T> (table: string): Promise<T[]> {
+async function findAll<T> (table: string, options: object): Promise<T[]> {
+  const {
+    keyConditionExpression,
+    expressionAttrValues
+  } = convertOptionsToExpressionValues(options)
+
   const params = {
-    TableName: table
+    TableName: table,
+    KeyConditionExpression: keyConditionExpression,
+    ExpressionAttributeValues: expressionAttrValues
   }
 
-  const res = await ddb.scan(params).promise()
+  const res = await ddb.query(params).promise()
   return <T[]>res.Items
 }
 
-async function findBy<T> (table: string, conditions: object): Promise<T[]> {
+async function findBy<T> (table: string, options: object): Promise<T[]> {
   const {
-    filterExpressions,
+    keyConditionExpression,
     expressionAttrValues
-  } = convertConditionsToExpressionValues(conditions)
+  } = convertOptionsToExpressionValues(options)
 
   const params = {
-    FilterExpression: filterExpressions,
+    FilterExpression: keyConditionExpression,
     ExpressionAttributeValues: expressionAttrValues,
     TableName: table
   }
