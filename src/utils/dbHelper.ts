@@ -8,11 +8,11 @@ interface ExpressionValues {
 interface Options {
   pk?: {
     value: string
-    condition: string
+    condition?: string
   }
   sk?: {
     value: string
-    condition: string
+    condition?: string
   }
 }
 
@@ -25,16 +25,16 @@ export function convertOptionsToExpressionValues (
   const pkObject = options.pk
   const skObject = options.sk
 
-  if (pkObject) {
-    keyConditionExpression += `PK = :pk AND `
-    expressionAttrValues[`:pk`] = pkObject.value
-  }
+  if (!pkObject) throw new Error('PK is required when fetching data')
+
+  keyConditionExpression += `PK = :pk`
+  expressionAttrValues[`:pk`] = pkObject.value
 
   if (skObject) {
     if (skObject.condition && skObject.condition === 'begins_with') {
-      keyConditionExpression += `begins_with(SK, :sk)`
+      keyConditionExpression += ` AND begins_with(SK, :sk)`
     } else {
-      keyConditionExpression += `SK = :sk`
+      keyConditionExpression += ` AND SK = :sk`
     }
 
     expressionAttrValues[`:sk`] = skObject.value
