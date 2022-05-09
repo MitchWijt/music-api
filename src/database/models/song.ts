@@ -3,13 +3,13 @@ import cuid from 'cuid'
 
 export default {
   create,
-  findBy,
-  findAll,
-  findOneBy
+  findByArtist,
+  findOneByArtist
 }
 
 export interface Song {
-  song_uuid?: string
+  PK: string
+  SK?: string
   amountStreamed?: number
   cover: string
   description: string
@@ -18,22 +18,10 @@ export interface Song {
   url: string
 }
 
-interface SongConditions {
-  song_uuid?: string
-  amountStreamed?: number
-  cover?: string
-  description?: string
-  duration?: number
-  title?: string
-  url?: string
-}
-
-//TODO: Make sure the PK value comes from the Schema. And make this a findByArtist instead of findAll
-async function findAll (): Promise<Song[]> {
-  return dynamoDB.findAll<Song>('artists', {
+async function findByArtist (artist_uuid: string): Promise<Song[]> {
+  return dynamoDB.query<Song>('artists', {
     pk: {
-      value: 'artist_e31a1336-d789-47df-96b2-e92715f8b1dd',
-      condition: ''
+      value: artist_uuid
     },
     sk: {
       value: 'song',
@@ -42,26 +30,25 @@ async function findAll (): Promise<Song[]> {
   })
 }
 
-//TODO: Make all functions work with certain PK and SK combinations. OR only a PK call if we want a single record
-//TODO: Make a small documentation in regards to dynamoDB. In essence we can have 1 function that takes in different PK and SK combinations from different tables to fetch different results
+async function findOneByArtist ({ artist_uuid, song_uuid }: {artist_uuid: string, song_uuid: string}): Promise<Song> {
+  const items = await dynamoDB.query<Song>('artists', {
+    pk: {
+      value: artist_uuid
+    },
+    sk: {
+      value: song_uuid,
+    }
+  })
 
-//TODO: Make sure all Song, Artist and Album queries work.
-
-async function findOneBy (conditions: SongConditions): Promise<Song> {
-  const items = await findBy(conditions)
   if (!items.length) return <Song>{}
-
   return items[0]
 }
 
-async function findBy (conditions: SongConditions): Promise<Song[]> {
-  return dynamoDB.findBy<Song>('artists', conditions)
-}
-
 async function create (data: Song): Promise<Song> {
-  data.song_uuid = cuid()
+  const songUUID = `song_${cuid()}`
+  data.SK = songUUID
   data.amountStreamed = 0
 
   await dynamoDB.put('artists', data)
-  return findOneBy({ song_uuid: data.song_uuid })
+  return findOneByArtist({ artist_uuid: data.PK, song_uuid: songUUID })
 }

@@ -2,8 +2,10 @@ import { gql } from 'apollo-server'
 
 export const schema = gql`
   type Artist {
-    artist_pk: String!
+    PK: String!
+    SK: String!
     name: String!
+    bio: String!
     profilePicture: String!
   }
 
@@ -20,7 +22,7 @@ export const schema = gql`
 export const resolvers = {
   Query: {
     async artist (root, { artist_uuid }, { models }) {
-      return models.Artist.findOneBy({ artist_uuid })
+      return models.Artist.findOne(artist_uuid)
     },
     async allArtists (root, args, { models }) {
       return models.Artist.findAll()
