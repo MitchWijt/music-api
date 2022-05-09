@@ -5,11 +5,11 @@ const ddb = new DocumentClient({ region: 'us-east-1' })
 
 export default {
   put,
-  findBy,
-  findAll
+  query,
+  get
 }
 
-async function findAll<T> (table: string, options: object): Promise<T[]> {
+async function query<T> (table: string, options: object): Promise<T[]> {
   const {
     keyConditionExpression,
     expressionAttrValues
@@ -25,20 +25,16 @@ async function findAll<T> (table: string, options: object): Promise<T[]> {
   return <T[]>res.Items
 }
 
-async function findBy<T> (table: string, options: object): Promise<T[]> {
-  const {
-    keyConditionExpression,
-    expressionAttrValues
-  } = convertOptionsToExpressionValues(options)
-
+async function get<T> (table: string, pkValue: any): Promise<T> {
   const params = {
-    FilterExpression: keyConditionExpression,
-    ExpressionAttributeValues: expressionAttrValues,
-    TableName: table
+    TableName: table,
+    Key: {
+      PK: pkValue
+    }
   }
 
-  const res = await ddb.scan(params).promise()
-  return <T[]>res.Items
+  const res = await ddb.get(params).promise()
+  return <T>res.Item
 }
 
 async function put<T> (table: string, data: T): Promise<void> {

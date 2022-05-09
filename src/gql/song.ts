@@ -2,7 +2,8 @@ import { gql } from 'apollo-server'
 
 export const schema = gql`
   type Song {
-    song_uuid: String!
+    PK: String!
+    SK: String!
     title: String!
     description: String!
     url: String!
@@ -12,12 +13,13 @@ export const schema = gql`
   }
 
   type Query {
-    song(song_uuid: String!): Song!
-    allSongs: [Song!]!
+    song(artist_uuid: String!, song_uuid: String!): Song!
+    allSongsFromArtist(artist_uuid: String!): [Song!]!
   }
 
   type Mutation {
     createSong(
+      PK: String!
       title: String!
       description: String!
       url: String!
@@ -29,11 +31,11 @@ export const schema = gql`
 
 export const resolvers = {
   Query: {
-    async song (root, { song_uuid }, { models }) {
-      return models.Song.findOneBy({ song_uuid })
+    async song (root, { artist_uuid, song_uuid }, { models }) {
+      return models.Song.findOneByArtist({ artist_uuid, song_uuid })
     },
-    async allSongs (root, args, { models }) {
-      return models.Song.findAll()
+    async allSongsFromArtist (root, { artist_uuid }, { models }) {
+      return models.Song.findByArtist(artist_uuid)
     }
   },
   Mutation: {

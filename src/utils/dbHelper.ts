@@ -25,19 +25,13 @@ export function convertOptionsToExpressionValues (
   const pkObject = options.pk
   const skObject = options.sk
 
-  // can be made in a generic function based on the PK or SK
-  // we can determine if AND needs to be appended to the string based on if we have an SK value
   if (pkObject) {
-    if (pkObject.condition === 'begins_with') {
-      keyConditionExpression += `begins_with(PK, :pk) AND `
-    } else {
-      keyConditionExpression += `PK = :pk AND `
-    }
+    keyConditionExpression += `PK = :pk AND `
     expressionAttrValues[`:pk`] = pkObject.value
   }
 
   if (skObject) {
-    if (skObject.condition === 'begins_with') {
+    if (skObject.condition && skObject.condition === 'begins_with') {
       keyConditionExpression += `begins_with(SK, :sk)`
     } else {
       keyConditionExpression += `SK = :sk`
