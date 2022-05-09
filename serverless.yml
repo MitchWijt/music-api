@@ -1,0 +1,21 @@
+# serverless.yml
+
+service: apollo-lambda
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+provider:
+  name: aws
+  runtime: nodejs14.x
+functions:
+  graphql:
+    handler: src/handler.graphqlHandler
+    events:
+    - http:
+        path: graphql
+        method: post
+        cors: true
+    - http:
+        path: graphql
+        method: get
+        cors: true

@@ -5,8 +5,17 @@
     "target": "es6",
     "moduleResolution": "Node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "lib"
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "declarations.d.ts"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    ".serverless/**/*",
+    ".webpack/**/*",
+    ".vscode/**/*"
+  ],
   "lib": ["es2015"]
 }
