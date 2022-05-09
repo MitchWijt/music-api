@@ -15,7 +15,7 @@ export const schema = gql`
   }
 
   type Mutation {
-    createArtist(name: String!, profilePicture: String!): Artist!
+    createArtist(name: String!, profilePicture: String!, bio: String!): Artist!
   }
 `
 
