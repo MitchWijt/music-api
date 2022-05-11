@@ -16,32 +16,38 @@ interface Options {
   }
 }
 
-export function convertOptionsToExpressionValues (
-  options: Options
-): ExpressionValues {
-  let keyConditionExpression = ''
-  let expressionAttrValues = {}
+export interface IDbHelper {
+  convertOptionsToExpressionValues(options: Options): ExpressionValues
+}
 
-  const pkObject = options.pk
-  const skObject = options.sk
-
-  if (!pkObject) throw new Error('PK is required when fetching data')
-
-  keyConditionExpression += `PK = :pk`
-  expressionAttrValues[`:pk`] = pkObject.value
-
-  if (skObject) {
-    if (skObject.condition && skObject.condition === 'begins_with') {
-      keyConditionExpression += ` AND begins_with(SK, :sk)`
-    } else {
-      keyConditionExpression += ` AND SK = :sk`
+export class DbHelper implements IDbHelper {
+  public convertOptionsToExpressionValues (
+    options: Options
+  ): ExpressionValues {
+    let keyConditionExpression = ''
+    let expressionAttrValues = {}
+  
+    const pkObject = options.pk
+    const skObject = options.sk
+  
+    if (!pkObject) throw new Error('PK is required when fetching data')
+  
+    keyConditionExpression += `PK = :pk`
+    expressionAttrValues[`:pk`] = pkObject.value
+  
+    if (skObject) {
+      if (skObject.condition && skObject.condition === 'begins_with') {
+        keyConditionExpression += ` AND begins_with(SK, :sk)`
+      } else {
+        keyConditionExpression += ` AND SK = :sk`
+      }
+  
+      expressionAttrValues[`:sk`] = skObject.value
     }
-
-    expressionAttrValues[`:sk`] = skObject.value
-  }
-
-  return <ExpressionValues>{
-    keyConditionExpression,
-    expressionAttrValues
+  
+    return <ExpressionValues>{
+      keyConditionExpression,
+      expressionAttrValues
+    }
   }
 }
