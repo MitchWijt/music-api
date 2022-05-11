@@ -1,47 +1,58 @@
-import { DocumentClient, ItemList } from 'aws-sdk/clients/dynamodb'
-import { convertOptionsToExpressionValues } from '../utils/dbHelper'
+import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import { IDbHelper } from '../utils/dbHelper'
 
-const ddb = new DocumentClient({ region: 'us-east-1' })
 
-export default {
-  put,
-  query,
-  get
+export interface IDatabase {
+  put<T>(table: string, data: T): Promise<void>
+  query<T>(table: string, options: object): Promise<T[]>
+  get<T>(table: string, pkValue: any): Promise<T>
 }
 
-async function query<T> (table: string, options: object): Promise<T[]> {
-  const {
-    keyConditionExpression,
-    expressionAttrValues
-  } = convertOptionsToExpressionValues(options)
+export class Database implements IDatabase {
+  private client: DocumentClient
+  private dbHelper: IDbHelper
 
-  const params = {
-    TableName: table,
-    KeyConditionExpression: keyConditionExpression,
-    ExpressionAttributeValues: expressionAttrValues
+
+  constructor(dbHelper: IDbHelper, client: DocumentClient){
+    this.client = client
+    this.dbHelper = dbHelper
   }
 
-  const res = await ddb.query(params).promise()
-  return <T[]>res.Items
-}
-
-async function get<T> (table: string, pkValue: any): Promise<T> {
-  const params = {
-    TableName: table,
-    Key: {
-      PK: pkValue
+  public async query<T> (table: string, options: object): Promise<T[]> {
+    const {
+      keyConditionExpression,
+      expressionAttrValues
+    } = this.dbHelper.convertOptionsToExpressionValues(options)
+  
+    const params = {
+      TableName: table,
+      KeyConditionExpression: keyConditionExpression,
+      ExpressionAttributeValues: expressionAttrValues
     }
+  
+    const res = await this.client.query(params).promise()
+    return <T[]>res.Items
   }
-
-  const res = await ddb.get(params).promise()
-  return <T>res.Item
+  
+  public async get<T> (table: string, pkValue: any): Promise<T> {
+    const params = {
+      TableName: table,
+      Key: {
+        PK: pkValue
+      }
+    }
+  
+    const res = await this.client.get(params).promise()
+    return <T>res.Item
+  }
+  
+  public async put<T> (table: string, data: T): Promise<void> {
+    const params = {
+      Item: data,
+      TableName: table
+    }
+  
+    await this.client.put(params).promise()
+  }
 }
 
-async function put<T> (table: string, data: T): Promise<void> {
-  const params = {
-    Item: data,
-    TableName: table
-  }
-
-  await ddb.put(params).promise()
-}

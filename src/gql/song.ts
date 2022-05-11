@@ -31,16 +31,16 @@ export const schema = gql`
 
 export const resolvers = {
   Query: {
-    async song (root, { artist_uuid, song_uuid }, { models }) {
-      return models.Song.findOneByArtist({ artist_uuid, song_uuid })
+    async song (root, { artist_uuid, song_uuid }, { songService }) {
+      return songService.findOneByArtist({ artist_uuid, song_uuid })
     },
-    async allSongsFromArtist (root, { artist_uuid }, { models }) {
-      return models.Song.findByArtist(artist_uuid)
+    async allSongsFromArtist (root, { artist_uuid }, { songService }) {
+      return songService.findByArtist(artist_uuid)
     }
   },
   Mutation: {
-    async createSong (root, data, { models }) {
-      return models.Song.create(data)
+    async createSong (root, data, { songService }) {
+      return songService.create(data)
     }
   }
 }

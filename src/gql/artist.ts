@@ -21,16 +21,16 @@ export const schema = gql`
 
 export const resolvers = {
   Query: {
-    async artist (root, { artist_uuid }, { models }) {
-      return models.Artist.findOne(artist_uuid)
+    async artist (root, { artist_uuid }, { artistService }) {
+      return artistService.findOne(artist_uuid)
     },
-    async allArtists (root, args, { models }) {
-      return models.Artist.findAll()
+    async allArtists (root, args, { artistService }) {
+      return artistService.findAll()
     }
   },
   Mutation: {
-    async createArtist (root, data, { models }) {
-      return models.Artist.create(data)
+    async createArtist (root, data, { artistService }) {
+      return artistService.create(data)
     }
   }
 }
