@@ -3,3 +3,6 @@ dist
 awscredentials.json
 .serverless
 .build
+.idea
+lib
+cdk/cdk.out
