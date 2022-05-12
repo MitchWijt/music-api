@@ -11,7 +11,10 @@ export class Stack extends cdk.Stack {
         const lambdaFunction = new NodejsFunction(this, "music-api-gql", {
             runtime: lambda.Runtime.NODEJS_14_X,
             handler: "graphqlHandler",
-            entry: join(__dirname, '../src/handler.ts')
+            entry: join(__dirname, '../src/handler.ts'),
+            bundling: {
+                minify: true
+            }
         })
 
         new apiGateway.LambdaRestApi(this, "music-api-gatway", {
