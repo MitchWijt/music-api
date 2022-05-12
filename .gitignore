@@ -6,3 +6,5 @@ awscredentials.json
 .idea
 lib
 cdk/cdk.out
+.DS_Store
+.cdk/.*
