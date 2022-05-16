@@ -4,7 +4,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apiGateway from "aws-cdk-lib/aws-apigateway"
 import { join } from 'path'
 
-export class Stack extends cdk.Stack {
+class Stack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 

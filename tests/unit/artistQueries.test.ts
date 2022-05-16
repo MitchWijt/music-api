@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server'
+import { ApolloServer, gql } from 'apollo-server-lambda'
 import { resolvers, schema } from '../../src/gql/artist'
 
 const testServer = new ApolloServer({
