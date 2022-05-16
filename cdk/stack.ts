@@ -17,7 +17,7 @@ class Stack extends cdk.Stack {
             }
         })
 
-        new apiGateway.LambdaRestApi(this, "music-api-gatway", {
+        new apiGateway.LambdaRestApi(this, "music-api-gateway", {
             handler: lambdaFunction
         })
     }
@@ -25,7 +25,7 @@ class Stack extends cdk.Stack {
 
 const app = new cdk.App()
 
-new Stack(app, "my-cdk-stack", {
-    stackName: 'my-cdk-stack'
+new Stack(app, "music-api-gql", {
+    stackName: 'music-api-gql'
 })
 
